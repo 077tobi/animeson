@@ -1,33 +1,74 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+const admin = require('firebase-admin');
+const axios = require('axios');
+const cheerio = require('cheerio');
 const app = express();
 const port = 3000;
 
-// Use o body-parser para analisar o corpo das requisições
-app.use(bodyParser.json());
+app.use(express.json());
 
-// Dados dos animes (substitua pelo seu JSON real)
-let animes = [
-  {
-    "nome": "Tsue to Tsurugi no Wistoria - Todos os Episódios",
-    "capa": "https://animefire.plus/img/animes/tsue-to-tsurugi-no-wistoria.webp",
-    "link": "https://animefire.plus/animes/tsue-to-tsurugi-no-wistoria-todos-os-episodios" 
-  },
-  // ... (adicione os outros animes aqui)
-];
+const serviceAccount = require('./revonchat.json');
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://revon-chat-default-rtdb.firebaseio.com/'
+});
+const db = admin.database();
 
-// Rota para obter a lista de animes
-app.get('/animes', (req, res) => {
-  res.json(animes);
+app.get('/animes', async (req, res) => {
+  try {
+    const animesRef = db.ref('animes');
+    const animesSnapshot = await animesRef.once('value');
+    const animes = animesSnapshot.val();
+    res.json(animes);
+  } catch (error) {
+    console.error("Erro ao obter animes:", error);
+    res.status(500).json({ error: "Erro ao obter animes", details: error.message });
+  }
 });
 
-// Rota para enviar um novo anime
-app.post('/animes', (req, res) => {
-  const novoAnime = req.body;
-  animes.push(novoAnime);
-  res.json({ message: 'Anime adicionado com sucesso!' });
+app.post('/animes', async (req, res) => {
+  const novoAnime = req.body;
+  try {
+    if (!novoAnime.titulo || !novoAnime.link) {
+      return res.status(400).json({ error: "Dados inválidos" });
+    }
+    const animesRef = db.ref('animes');
+    await animesRef.push(novoAnime);
+    res.json({ message: 'Anime adicionado com sucesso!' });
+  } catch (error) {
+    console.error("Erro ao adicionar anime:", error);
+    res.status(500).json({ error: "Erro ao adicionar anime", details: error.message });
+  }
+});
+
+app.get('/episodios/:animeLink', async (req, res) => {
+  const animeLink = req.params.animeLink;
+
+  try {
+    const response = await axios.get(animeLink);
+    const html = response.data;
+
+    const $ = cheerio.load(html);
+    const itemElements = $('div.div_video_list a.lEp');
+
+    const itemInfoList = [];
+    itemElements.each((index, element) => {
+      const link = $(element).attr('href');
+      const titulo = $(element).text();
+
+      itemInfoList.push({
+        "link": link,
+        "titulo": titulo
+      });
+    });
+
+    res.json(itemInfoList);
+  } catch (error) {
+    console.error("Erro ao obter episódios:", error);
+    res.status(500).json({ error: "Erro ao obter episódios", details: error.message });
+  }
 });
 
 app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
+  console.log(`Servidor rodando na porta ${port}`);
 });
