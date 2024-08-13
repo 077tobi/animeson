@@ -1,6 +1,13 @@
+const express = require('express');
+const axios = require('axios');
+const cheerio = require('cheerio');
+
+const app = express();
+const port = 3000;
+
 app.get('/api/visioncine/:animeId', async (req, res) => {
     const animeId = req.params.animeId;
-    const url = `https://www.visioncine-2.com/watch/make-heroine-ga-oosugiru${animeId}`; // Substitua 'make-heroine-ga-oosugiru' pelo nome do anime
+    const url = `https://www.visioncine-2.com/watch/${animeId}`; // Usando o animeId direto na URL
 
     try {
         const response = await axios.get(url);
@@ -38,4 +45,8 @@ app.get('/api/visioncine/:animeId', async (req, res) => {
         console.error('Error fetching data:', error);
         res.status(500).json({ error: 'Failed to fetch data' });
     }
+});
+
+app.listen(port, () => {
+    console.log(`Server listening at http://localhost:${port}`);
 });
