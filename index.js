@@ -14,11 +14,11 @@ app.get('/api/avatar/:name', async (req, res) => {
     const html = response.data;
     const $ = cheerio.load(html);
 
-    const imgSrc = $('img').attr('src');
+    const imgAlt = $('img').attr('alt'); // Extrair o atributo "alt"
 
-    if (imgSrc) {
+    if (imgAlt) {
       const jsonData = {
-        avatar: imgSrc
+        avatar: imgAlt // Usar o atributo "alt" como URL da imagem
       };
       res.json(jsonData);
     } else {
