@@ -6,17 +6,15 @@ const app = express();
 const port = 3000;
 
 app.get('/api/animefire', async (req, res) => {
-  const url = "https://animefire.plus/animes/ookami-to-koushinryou-merchant-meets-the-wise-wolf-todos-os-episodios"; // URL fixa
+  const url = "https://animefire.plus/animes/ookami-to-koushinryou-merchant-meets-the-wise-wolf-todos-os-episodios";
 
   try {
-    const response = await axios.get(url, { timeout: 10000 });
+    const response = await axios.get(url, { timeout: 20000 }); 
     const html = response.data;
     const $ = cheerio.load(html);
 
-    // Extrair o título do anime
-    const animeTitle = $('h1.page-title').text().trim();
+    const animeTitle = $('h1.page-title').text().trim(); 
 
-    // Extrair a lista de episódios
     const episodes = [];
     $('.div_video_list a.lEp').each((index, element) => {
       const episodeLink = $(element).attr('href');
@@ -35,7 +33,7 @@ app.get('/api/animefire', async (req, res) => {
 
     res.json(data);
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error('Error fetching data:', error.response.status, error.response.data); 
     res.status(500).json({ error: 'Failed to fetch data' });
   }
 });
