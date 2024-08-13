@@ -1,39 +1,41 @@
 const express = require('express');
 const axios = require('axios');
 const cheerio = require('cheerio');
+const moment = require('moment'); // Adicione a biblioteca moment
 
 const app = express();
 const port = 3000;
 
-app.get('/api/animefire', async (req, res) => {
-  const url = "https://animefire.plus/animes/ookami-to-koushinryou-merchant-meets-the-wise-wolf-todos-os-episodios";
+app.get('/api/animefire/new', async (req, res) => {
+  const url = "https://animefire.plus/"; 
 
   try {
-    const response = await axios.get(url, { timeout: 20000 }); 
+    const response = await axios.get(url, { timeout: 10000 });
     const html = response.data;
     const $ = cheerio.load(html);
 
-    const animeTitle = $('h1.page-title').text().trim(); 
+    const newEpisodes = [];
+    $('.divCardUltimosEpsHome').each((index, element) => {
+      const episodeLink = $(element).find('a').attr('href');
+      const episodeTitle = $(element).find('.animeTitle').text().trim();
+      const episodeNumber = $(element).find('.numEp').text().trim();
+      const episodeImage = $(element).find('.card-img-top').attr('data-src'); // Pega a URL da imagem
 
-    const episodes = [];
-    $('.div_video_list a.lEp').each((index, element) => {
-      const episodeLink = $(element).attr('href');
-      const episodeTitle = $(element).text().trim();
+      const publishedDateStr = $(element).find('.ep-dateModified').attr('data-date-modified');
+      const publishedDate = moment(publishedDateStr).fromNow(); // Calcula o tempo desde a publicação
 
-      episodes.push({
+      newEpisodes.push({
         episodeLink,
-        episodeTitle
+        episodeTitle,
+        episodeNumber,
+        episodeImage,
+        publishedDate
       });
     });
 
-    const data = {
-      animeTitle,
-      episodes
-    };
-
-    res.json(data);
+    res.json(newEpisodes);
   } catch (error) {
-    console.error('Error fetching data:', error.response.status, error.response.data); 
+    console.error('Error fetching data:', error.response.status, error.response.data);
     res.status(500).json({ error: 'Failed to fetch data' });
   }
 });
