@@ -5,9 +5,8 @@ const cheerio = require('cheerio');
 const app = express();
 const port = 3000;
 
-app.get('/api/visioncine/episodes/:animeId', async (req, res) => {
-  const animeId = req.params.animeId;
-  const url = `https://www.visioncine.com/anime/${animeId}`;
+app.get('/api/episodes', async (req, res) => {
+  const url = 'http://visioncine-2.com/watch/sakamoto-desu-ga'; // URL da página
 
   try {
     const response = await axios.get(url);
@@ -15,33 +14,48 @@ app.get('/api/visioncine/episodes/:animeId', async (req, res) => {
     const $ = cheerio.load(html);
 
     const episodes = [];
-    $('.episodios .episodio').each((index, element) => {
-      const episodeLink = $(element).find('a').attr('href');
+
+    $('.ep').each((index, element) => {
+      const episodeNumber = $(element).find('p[number]').text().trim();
       const episodeTitle = $(element)
-        .find('.episodio-titulo')
+        .find('.info h5.fw-bold')
         .text()
         .trim();
-      const episodeNumber = $(element)
-        .find('.episodio-numero')
+      const episodeDuration = $(element)
+        .find('.info .small:nth-child(1)')
         .text()
         .trim();
-      const imageUrl = $(element).find('img').attr('src');
+      const episodePublished = $(element)
+        .find('.info .small:nth-child(2)')
+        .text()
+        .trim();
+      const episodeLink = $(element)
+        .find('.buttons a.btn.free')
+        .attr('href');
+      const episodeImage = $(element)
+        .find('.image')
+        .attr('style')
+        .split('url(')[1]
+        .replace(')', '')
+        .trim(); // Extraindo a URL da imagem
 
       episodes.push({
-        episodeLink,
-        episodeTitle,
         episodeNumber,
-        imageUrl,
+        episodeTitle,
+        episodeDuration,
+        episodePublished,
+        episodeLink,
+        episodeImage,
       });
     });
 
     res.json(episodes);
   } catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).json({ error: 'Failed to fetch data' });
+    console.error('Erro ao obter os dados:', error);
+    res.status(500).json({ error: 'Falha ao obter dados' });
   }
 });
 
 app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
+  console.log(`Servidor rodando em http://localhost:${port}`);
 });
