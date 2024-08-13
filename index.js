@@ -5,9 +5,8 @@ const cheerio = require('cheerio');
 const app = express();
 const port = 3000;
 
-app.get('/api/animefire/:animeId', async (req, res) => {
-  const animeId = req.params.animeId;
-  const url = `https://animefire.plus/animes/${animeId}-todos-os-episodios`;
+app.get('/api/animefire', async (req, res) => {
+  const url = "https://animefire.plus/animes/ookami-to-koushinryou-merchant-meets-the-wise-wolf-todos-os-episodios"; // URL fixa
 
   try {
     const response = await axios.get(url, { timeout: 10000 });
