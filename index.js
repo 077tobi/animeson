@@ -1,25 +1,38 @@
-const express = require('express');
-const axios = require('axios');
+   const express = require('express');
+   const axios = require('axios');
+   const cheerio = require('cheerio'); // Importar o Cheerio
 
-const app = express();
-const port = 3000;
+   const app = express();
+   const port = 3000;
 
-app.get('/api/avatar/:name', async (req, res) => {
-  const name = req.params.name;
-  const url = `https://anime.kirwako.com/api/avatar?name=${name}`;
+   app.get('/api/anroll/:animeId', async (req, res) => {
+       const animeId = req.params.animeId; // Obter ID do anime da URL
+       const url = `https://anroll.net/e/${animeId}`;
 
-  try {
-    const response = await axios.get(url, { responseType: 'arraybuffer' }); // Obter resposta como buffer
+       try {
+           const response = await axios.get(url); 
+           const html = response.data;
+           const $ = cheerio.load(html); // Carregar o HTML no Cheerio
 
-    // Envie a imagem como resposta
-    res.setHeader('Content-Type', response.headers['content-type']); // Definir o tipo de conteúdo
-    res.send(response.data); 
-  } catch (error) {
-    console.error('Error fetching avatar:', error);
-    res.status(500).json({ error: 'Failed to fetch avatar' });
-  }
-});
+           // Extrair os dados desejados:
+           const imageUrl = $('img').attr('src'); // URL da imagem
+           const animeTitle = $('h1').text().trim(); // Título do anime
+           const episodeNumber = $('span.episode-badge b').text(); // Número do episódio
 
-app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
-});
+           const data = {
+               imageUrl,
+               animeTitle,
+               episodeNumber,
+           };
+
+           res.json(data); // Retornar os dados como JSON
+       } catch (error) {
+           console.error('Error fetching data:', error);
+           res.status(500).json({ error: 'Failed to fetch data' });
+       }
+   });
+
+   app.listen(port, () => {
+       console.log(`Server listening at http://localhost:${port}`);
+   });
+   
