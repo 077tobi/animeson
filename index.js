@@ -5,8 +5,8 @@ const cheerio = require('cheerio');
 const app = express();
 const port = 3000;
 
-app.get('/api/animefire/latest', async (req, res) => {
-    const url = 'https://animefire.plus/'; // URL da página inicial
+app.get('/api/anroll/latest', async (req, res) => {
+    const url = 'https://www.anroll.net/a/9rIoZj1RyA'; // URL da página específica dos últimos episódios
 
     try {
         const response = await axios.get(url);
@@ -14,19 +14,17 @@ app.get('/api/animefire/latest', async (req, res) => {
         const $ = cheerio.load(html);
 
         const episodes = [];
-        $('.divCardUltimosEpsHome').each((index, element) => {
+        $('.itemlistepisode').each((index, element) => {
             const episodeLink = $(element).find('a').attr('href');
-            const animeTitle = $(element).find('.animeTitle').text().trim();
-            const episodeNumber = $(element).find('.numEp').text().trim();
-            const imageUrl = $(element).find('.imgAnimesUltimosEps').attr('data-src');
-            const episodeDate = $(element).find('.ep-dateModified').attr('data-date-modified');
+            const animeTitle = $(element).find('.titulo_episodio').text().trim();
+            const episodeNumber = $(element).find('.n_episodio span').text().trim();
+            const imageUrl = $(element).find('img').attr('src');
 
             episodes.push({
                 episodeLink,
                 animeTitle,
                 episodeNumber,
                 imageUrl,
-                episodeDate
             });
         });
 
@@ -38,5 +36,5 @@ app.get('/api/animefire/latest', async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log('Server listening at http://localhost:${port}');
+    console.log(`Server listening at http://localhost:${port}`);
 });
