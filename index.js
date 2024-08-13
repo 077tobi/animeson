@@ -6,8 +6,8 @@ const app = express();
 const port = 3000;
 
 app.get('/api/anroll/episodes/:animeId', async (req, res) => {
-    const animeId = req.params.animeId; // Pega o ID do anime da URL
-    const url = `https://www.anroll.net/a/${animeId}`; // Monta a URL da página de detalhes
+    const animeId = req.params.animeId;
+    const url = `https://www.anroll.net/a/${animeId}`;
 
     try {
         const response = await axios.get(url);
@@ -15,7 +15,7 @@ app.get('/api/anroll/episodes/:animeId', async (req, res) => {
         const $ = cheerio.load(html);
 
         const episodes = [];
-        $('.itemlistepisode').each((index, element) => {
+        $('li:has(a[href^="/e/"])').each((index, element) => { 
             const episodeLink = $(element).find('a').attr('href');
             const episodeTitle = $(element).find('.titulo_episodio').text().trim();
             const episodeNumber = $(element).find('.n_episodio span').text().trim();
