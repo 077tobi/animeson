@@ -5,9 +5,9 @@ const cheerio = require('cheerio');
 const app = express();
 const port = 3000;
 
-app.get('/api/anroll/episodes/:animeId', async (req, res) => {
+app.get('/api/visioncine/episodes/:animeId', async (req, res) => {
   const animeId = req.params.animeId;
-  const url = `https://www.anroll.net/a/${animeId}`;
+  const url = `https://www.visioncine.com/anime/${animeId}`;
 
   try {
     const response = await axios.get(url);
@@ -15,14 +15,14 @@ app.get('/api/anroll/episodes/:animeId', async (req, res) => {
     const $ = cheerio.load(html);
 
     const episodes = [];
-    $('.content_ep').each((index, element) => {
+    $('.episodios .episodio').each((index, element) => {
       const episodeLink = $(element).find('a').attr('href');
       const episodeTitle = $(element)
-        .find('.titulo_episodio')
+        .find('.episodio-titulo')
         .text()
         .trim();
       const episodeNumber = $(element)
-        .find('.n_episodio span')
+        .find('.episodio-numero')
         .text()
         .trim();
       const imageUrl = $(element).find('img').attr('src');
