@@ -1,6 +1,5 @@
 const express = require('express');
 const axios = require('axios');
-const cheerio = require('cheerio');
 
 const app = express();
 const port = 3000;
@@ -10,20 +9,11 @@ app.get('/api/avatar/:name', async (req, res) => {
   const url = `https://anime.kirwako.com/api/avatar?name=${name}`;
 
   try {
-    const response = await axios.get(url);
-    const html = response.data;
-    const $ = cheerio.load(html);
+    const response = await axios.get(url, { responseType: 'arraybuffer' }); // Obter resposta como buffer
 
-    const imgAlt = $('img').attr('alt'); // Extrair o atributo "alt"
-
-    if (imgAlt) {
-      const jsonData = {
-        avatar: imgAlt // Usar o atributo "alt" como URL da imagem
-      };
-      res.json(jsonData);
-    } else {
-      res.status(404).json({ error: 'Avatar not found' });
-    }
+    // Envie a imagem como resposta
+    res.setHeader('Content-Type', response.headers['content-type']); // Definir o tipo de conteúdo
+    res.send(response.data); 
   } catch (error) {
     console.error('Error fetching avatar:', error);
     res.status(500).json({ error: 'Failed to fetch avatar' });
