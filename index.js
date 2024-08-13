@@ -8,7 +8,7 @@ const port = 3000;
 async function getAnimeProfilePics(searchTerm) {
   try {
     // Faz uma requisição HTTP para a página de pesquisa do Pinterest
-    const response = await axios.get(`https://www.pinterest.com/search/pins/?q=${searchTerm}&rs=typed`);
+    const response = await axios.get(`https://www.pinterest.com/search/pins/?q=${searchTerm}&rs=typed`); // URL dentro de aspas simples
 
     // Usa o cheerio para analisar o HTML da página
     const $ = cheerio.load(response.data);
@@ -46,5 +46,5 @@ app.get('/anime-profile-pics', async (req, res) => {
 
 // Inicie o servidor
 app.listen(port, () => {
-  console.log(`API de fotos de perfil de animes rodando na porta ${port}`);
+  console.log('API de fotos de perfil de animes rodando na porta ${port}'); // Corrigindo a string de console.log
 });
