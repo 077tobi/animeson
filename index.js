@@ -7,7 +7,7 @@ const app = express();
 const port = 3000;
 
 app.get('/api/animefire/new', async (req, res) => {
-  const url = "https://animefire.plus/"; 
+  const url = "https://animefire.plus/";
 
   try {
     const response = await axios.get(url, { timeout: 10000 });
@@ -19,18 +19,23 @@ app.get('/api/animefire/new', async (req, res) => {
       const episodeLink = $(element).find('a').attr('href');
       const episodeTitle = $(element).find('.animeTitle').text().trim();
       const episodeNumber = $(element).find('.numEp').text().trim();
-      const episodeImage = $(element).find('.card-img-top').attr('data-src'); // Pega a URL da imagem
+      const episodeImage = $(element).find('.card-img-top').attr('data-src'); 
 
-      const publishedDateStr = $(element).find('.ep-dateModified').attr('data-date-modified');
-      const publishedDate = moment(publishedDateStr).fromNow(); // Calcula o tempo desde a publicação
+      // *Correção:* Encontre o elemento que contém a data de publicação.
+      // Você precisa inspecionar o HTML do Animefire para determinar o seletor correto.
+      // Por exemplo, se a data estiver em um atributo 'data-date' dentro de um elemento 'span':
+      const publishedDateStr = $(element).find('span').attr('data-date'); 
 
-      newEpisodes.push({
-        episodeLink,
-        episodeTitle,
-        episodeNumber,
-        episodeImage,
-        publishedDate
-      });
+      if (publishedDateStr) {
+        const publishedDate = moment(publishedDateStr).fromNow(); // Calcula o tempo desde a publicação
+        newEpisodes.push({
+          episodeLink,
+          episodeTitle,
+          episodeNumber,
+          episodeImage,
+          publishedDate
+        });
+      }
     });
 
     res.json(newEpisodes);
