@@ -1,53 +1,54 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
-const cheerio = require('cheerio'); // Adicione o cheerio aqui
+const cheerio = require('cheerio');
+const axios = require('axios');
 
 const app = express();
 const port = 3000;
 
-// Função para obter os links da página
-async function getLinks(url) {
+// Array para armazenar os episódios
+let episodes = [];
+
+// Função para atualizar a lista de episódios
+async function updateEpisodes() {
   try {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
+    const response = await axios.get('https://goyabu.to/home-2');
+    const $ = cheerio.load(response.data);
 
-    await page.goto(url);
+    episodes = []; // Limpa a lista atual
 
-    // Aguardar o carregamento do iframe com a classe 'metaframe'
-    await page.waitForSelector('iframe.metaframe');
+    // Seletores precisam ser atualizados de acordo com a estrutura do site
+    $('article.boxEP').each((index, element) => {
+      const link = $(element).find('a').attr('href');
+      const title = $(element).find('h3').text().trim(); // Supondo que o título está em um 'h3'
+      const episode = $(element).find('span.titleEP').text().trim(); // Supondo que o episódio está em um 'span.titleEP'
+      const image = $(element).find('img').attr('src');
+      const dublado = $(element).attr('data-tar');
+      const qualidade = $(element).attr('data-qualy');
 
-    // Obter o conteúdo HTML do iframe
-    const iframeContent = await page.evaluate(() => {
-      const iframe = document.querySelector('iframe.metaframe');
-      return iframe.contentDocument.body.innerHTML;
+      episodes.push({
+        link,
+        title,
+        episode,
+        image,
+        dublado,
+        qualidade
+      });
     });
-
-    const $ = cheerio.load(iframeContent); // Use o cheerio aqui
-
-    const links = []; // Array para armazenar os links
-
-    // Selecionar os links dentro do iframe
-    $('a[href^="https"]').each((index, element) => {
-      const link = $(element).attr('href');
-      links.push(link);
-    });
-
-    await browser.close();
-
-    return links;
   } catch (error) {
     console.error(error);
-    return []; // Retorna um array vazio em caso de erro
   }
 }
 
-// Rota para obter os links
-app.get('/links/:url', async (req, res) => {
-  const url = req.params.url;
-  const links = await getLinks(url);
-  res.json(links);
+// Atualiza a lista de episódios a cada X segundos (ajuste o valor)
+setInterval(updateEpisodes, 10000); // Atualiza a cada 10 segundos
+
+// Rota para obter a lista de episódios
+app.get('/episodes', (req, res) => {
+  res.json(episodes);
 });
 
 app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
+  console.log(Servidor rodando na porta ${port});
+  // Chama a função para atualizar a lista de episódios inicialmente
+  updateEpisodes();
 });
