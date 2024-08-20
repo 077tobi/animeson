@@ -10,16 +10,14 @@ let episodes = [];
 async function updateEpisodes() {
   try {
     const browser = await puppeteer.launch({
-      // Adicione configurações para melhorar a performance
-      headless: true, // Execute o navegador sem interface gráfica
-      args: ['--no-sandbox', '--disable-setuid-sandbox'], // Reduz o consumo de recursos
-      defaultNavigationTimeout: 10000 // Define um tempo limite de 10 segundos para o carregamento
+      headless: true, 
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      defaultNavigationTimeout: 10000
     });
     const page = await browser.newPage();
     await page.goto('https://goyabu.to/home-2');
 
-    // Aguardar o carregamento completo da página (verifique se 'article.boxEP' é o seletor correto)
-    await page.waitForSelector('article.boxEP'); 
+    await page.waitForSelector('article.boxEP'); // Ajuste o seletor conforme o HTML
 
     // Desabilitar recursos não essenciais (opcional)
     await page.setRequestInterception(true);
@@ -37,12 +35,12 @@ async function updateEpisodes() {
     episodes = [];
 
     $('article.boxEP').each((index, element) => {
-      const link = $(element).find('a').attr('href');
-      const title = $(element).find('h3').text().trim();
-      const episode = $(element).find('span.titleEP').text().trim();
-      const image = $(element).find('img').attr('src');
-      const dublado = $(element).attr('data-tar');
-      const qualidade = $(element).attr('data-qualy');
+      const link = $(element).find('a.episode-link').attr('href'); // Ajuste o seletor
+      const title = $(element).find('h3.episode-title').text().trim(); // Ajuste o seletor
+      const episode = $(element).find('span.episode-number').text().trim(); // Ajuste o seletor
+      const image = $(element).find('img.episode-image').attr('src'); // Ajuste o seletor
+      const dublado = $(element).attr('data-tar'); 
+      const qualidade = $(element).attr('data-qualy'); 
 
       episodes.push({
         link,
