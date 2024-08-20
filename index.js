@@ -1,54 +1,61 @@
-const express = require('express');
 const cheerio = require('cheerio');
-const axios = require('axios');
+     const puppeteer = require('puppeteer'); // Importe o Puppeteer
 
-const app = express();
-const port = 3000;
+     const app = express();
+     const port = 3000;
 
-// Array para armazenar os episódios
-let episodes = [];
+     // Array para armazenar os episódios
+     let episodes = [];
 
-// Função para atualizar a lista de episódios
-async function updateEpisodes() {
-  try {
-    const response = await axios.get('https://goyabu.to/home-2');
-    const $ = cheerio.load(response.data);
+     // Função para atualizar a lista de episódios
+     async function updateEpisodes() {
+         try {
+             const browser = await puppeteer.launch();
+             const page = await browser.newPage();
+             await page.goto('https://goyabu.to/home-2');
 
-    episodes = []; // Limpa a lista atual
+             // Aguardar o carregamento completo da página
+             await page.waitForSelector('article.boxEP');
 
-    // Seletores precisam ser atualizados de acordo com a estrutura do site
-    $('article.boxEP').each((index, element) => {
-      const link = $(element).find('a').attr('href');
-      const title = $(element).find('h3').text().trim(); // Supondo que o título está em um 'h3'
-      const episode = $(element).find('span.titleEP').text().trim(); // Supondo que o episódio está em um 'span.titleEP'
-      const image = $(element).find('img').attr('src');
-      const dublado = $(element).attr('data-tar');
-      const qualidade = $(element).attr('data-qualy');
+             // Obter o HTML da página
+             const html = await page.content();
+             const $ = cheerio.load(html);
 
-      episodes.push({
-        link,
-        title,
-        episode,
-        image,
-        dublado,
-        qualidade
-      });
-    });
-  } catch (error) {
-    console.error(error);
-  }
-}
+             episodes = []; // Limpa a lista atual
 
-// Atualiza a lista de episódios a cada X segundos (ajuste o valor)
-setInterval(updateEpisodes, 10000); // Atualiza a cada 10 segundos
+             $('article.boxEP').each((index, element) => {
+                 const link = $(element).find('a').attr('href');
+                 const title = $(element).find('h3').text().trim();
+                 const episode = $(element).find('span.titleEP').text().trim();
+                 const image = $(element).find('img').attr('src');
+                 const dublado = $(element).attr('data-tar');
+                 const qualidade = $(element).attr('data-qualy');
 
-// Rota para obter a lista de episódios
-app.get('/episodes', (req, res) => {
-  res.json(episodes);
-});
+                 episodes.push({
+                     link,
+                     title,
+                     episode,
+                     image,
+                     dublado,
+                     qualidade
+                 });
+             });
 
-app.listen(port, () => {
-  console.log(Servidor rodando na porta ${port});
-  // Chama a função para atualizar a lista de episódios inicialmente
-  updateEpisodes();
-});
+             await browser.close();
+         } catch (error) {
+             console.error(error);
+         }
+     }
+
+     // Atualiza a lista de episódios a cada X segundos (ajuste o valor)
+     setInterval(updateEpisodes, 10000); // Atualiza a cada 10 segundos
+
+     // Rota para obter a lista de episódios
+     app.get('/episodes', (req, res) => {
+         res.json(episodes);
+     });
+
+     app.listen(port, () => {
+         console.log('Servidor rodando na porta', port);
+         updateEpisodes(); // Chama a função para atualizar a lista de episódios inicialmente
+     });
