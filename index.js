@@ -1,70 +1,33 @@
 const express = require('express');
-const cheerio = require('cheerio');
-const puppeteer = require('puppeteer'); 
+const youtubeSearch = require('youtube-search-api');
 
 const app = express();
 const port = 3000;
 
-let episodes = [];
+// Define a API Key do YouTube
+const apiKey = 'AIzaSyCnvpTslrEESSwV3KQp28r6wIF-29DnVw8'; // Substitua pela sua API Key
 
-async function updateEpisodes() {
-  try {
-    const browser = await puppeteer.launch({
-      headless: true, 
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      defaultNavigationTimeout: 10000
-    });
-    const page = await browser.newPage();
-    await page.goto('https://goyabu.to/home-2');
-
-    await page.waitForSelector('article.boxEP'); // Ajuste o seletor conforme o HTML
-
-    // Desabilitar recursos não essenciais (opcional)
-    await page.setRequestInterception(true);
-    page.on('request', request => {
-      if (request.resourceType() === 'image' || request.resourceType() === 'stylesheet') {
-        request.abort();
-      } else {
-        request.continue();
-      }
-    });
-
-    const html = await page.content();
-    const $ = cheerio.load(html);
-
-    episodes = [];
-
-    $('article.boxEP').each((index, element) => {
-      const link = $(element).find('a.episode-link').attr('href'); // Ajuste o seletor
-      const title = $(element).find('h3.episode-title').text().trim(); // Ajuste o seletor
-      const episode = $(element).find('span.episode-number').text().trim(); // Ajuste o seletor
-      const image = $(element).find('img.episode-image').attr('src'); // Ajuste o seletor
-      const dublado = $(element).attr('data-tar'); 
-      const qualidade = $(element).attr('data-qualy'); 
-
-      episodes.push({
-        link,
-        title,
-        episode,
-        image,
-        dublado,
-        qualidade
-      });
-    });
-
-    await browser.close();
-  } catch (error) {
-    console.error(error);
+// Rota para buscar vídeos do YouTube
+app.get('/search', async (req, res) => {
+  const searchTerm = req.query.q;
+  if (!searchTerm) {
+    return res.status(400).send('O parâmetro "q" é obrigatório.');
   }
-}
 
-setInterval(updateEpisodes, 10000); 
+  try {
+    const results = await youtubeSearch.search({
+      key: apiKey,
+      term: searchTerm,
+      maxResults: 10,
+    });
 
-app.get('/episodes', (req, res) => {
-  res.json(episodes);
+    // Retorna os resultados da busca
+    res.json(results);
+  } catch (error) {
+    res.status(500).send('Erro ao buscar no YouTube: ' + error.message);
+  }
 });
 
 app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
-  updateEpisodes(); 
+  console.log(`API rodando na porta ${port}`);
 });
