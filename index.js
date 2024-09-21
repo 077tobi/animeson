@@ -33,9 +33,11 @@ app.post('/chat', (req, res) => {
   res.status(201).json({ message: 'Mensagem adicionada com sucesso', newMessage });
 });
 
-// Rota para obter todas as mensagens do chat
+// Rota para obter as últimas N mensagens do chat
 app.get('/chat', (req, res) => {
-  res.json(chatData);
+  const { count = 10 } = req.query; // Define o número de mensagens a serem retornadas, 10 por padrão
+  const lastMessages = chatData.slice(-count); // Obtem as últimas N mensagens
+  res.json(lastMessages);
 });
 
 // Inicia o servidor
