@@ -1,33 +1,44 @@
 const express = require('express');
-const youtubeSearch = require('youtube-search-api');
-
 const app = express();
 const port = 3000;
 
-// Define a API Key do YouTube
-const apiKey = 'AIzaSyCnvpTslrEESSwV3KQp28r6wIF-29DnVw8'; // Substitua pela sua API Key
+// Middleware para analisar dados JSON
+app.use(express.json());
 
-// Rota para buscar vídeos do YouTube
-app.get('/search', async (req, res) => {
-  const searchTerm = req.query.q;
-  if (!searchTerm) {
-    return res.status(400).send('O parâmetro "q" é obrigatório.');
+// Array para armazenar as informações do chat
+const chatData = [];
+
+// Rota para adicionar uma nova mensagem ao chat
+app.post('/chat', (req, res) => {
+  const { nome, verificado, foto, mensagem } = req.body;
+
+  // Validação básica dos campos (adicione mais validações conforme necessário)
+  if (!nome || !mensagem) {
+    return res.status(400).json({ error: 'Nome e mensagem são obrigatórios' });
   }
 
-  try {
-    const results = await youtubeSearch.search({
-      key: apiKey,
-      term: searchTerm,
-      maxResults: 10,
-    });
+  // Cria um novo objeto de mensagem
+  const newMessage = {
+    nome,
+    verificado: verificado || false, // Verificado é opcional, define como false por padrão
+    foto,
+    mensagem,
+    timestamp: new Date().toISOString(), // Adiciona um timestamp à mensagem
+  };
 
-    // Retorna os resultados da busca
-    res.json(results);
-  } catch (error) {
-    res.status(500).send('Erro ao buscar no YouTube: ' + error.message);
-  }
+  // Adiciona a mensagem ao array de dados do chat
+  chatData.push(newMessage);
+
+  // Retorna a resposta
+  res.status(201).json({ message: 'Mensagem adicionada com sucesso', newMessage });
 });
 
+// Rota para obter todas as mensagens do chat
+app.get('/chat', (req, res) => {
+  res.json(chatData);
+});
+
+// Inicia o servidor
 app.listen(port, () => {
-  console.log(`API rodando na porta ${port}`);
+  console.log(`Servidor rodando em http://localhost:${port}`);
 });
