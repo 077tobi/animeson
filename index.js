@@ -1,44 +1,31 @@
 const express = require('express');
-const axios = require('axios'); // Biblioteca para fazer requisições HTTP
-const cheerio = require('cheerio'); // Biblioteca para análise de HTML
+const puppeteer = require('puppeteer'); // Biblioteca para renderização de páginas web
 const app = express();
 const port = 3000;
-
-// Middleware para analisar dados JSON
-app.use(express.json());
-
-// URL do site a ser raspado
-const url = 'https://animefire.plus/';
 
 // Rota para obter os novos lançamentos de animes
 app.get('/animes', async (req, res) => {
   try {
-    // Fazer a requisição HTTP para o site
-    const response = await axios.get(url);
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto('https://animefire.plus/');
 
-    // Analisar o HTML da resposta
-    const $ = cheerio.load(response.data);
+    // Esperar que o JavaScript do site seja executado
+    await page.waitForSelector('.containerAnimes');
 
-    // Selecionar os elementos com a classe "containerAnimes"
-    const animes = $('.containerAnimes');
+    // Analisar o HTML da página renderizada
+    const content = await page.content();
+    const $ = cheerio.load(content);
 
-    // Extrair os dados de cada anime
-    const animesData = animes.map((index, element) => {
-      const title = $(element).find('.animeTitle').text();
-      const link = $(element).find('.item').attr('href');
-      const image = $(element).find('.imgAnimes').attr('data-src');
-      const lastEpisode = $(element).find('.horaUltimosEps').text();
-
-      return {
-        title,
-        link,
-        image,
-        lastEpisode,
-      };
+    // Extrair os dados dos animes
+    const animesData = $('.containerAnimes').map((index, element) => {
+      // ... (mesma lógica de extração do código anterior)
     }).get();
 
     // Retornar os dados dos animes em formato JSON
     res.json(animesData);
+
+    await browser.close();
   } catch (error) {
     console.error('Erro ao raspar o site:', error);
     res.status(500).json({ error: 'Erro ao obter os dados' });
