@@ -1,46 +1,51 @@
 const express = require('express');
+const axios = require('axios'); // Biblioteca para fazer requisições HTTP
+const cheerio = require('cheerio'); // Biblioteca para análise de HTML
 const app = express();
 const port = 3000;
 
 // Middleware para analisar dados JSON
 app.use(express.json());
 
-// Array para armazenar as informações do chat
-const chatData = [];
+// URL do site a ser raspado
+const url = 'https://animefire.plus/';
 
-// Rota para adicionar uma nova mensagem ao chat
-app.post('/chat', (req, res) => {
-  const { nome, verificado, foto, mensagem } = req.body;
+// Rota para obter os novos lançamentos de animes
+app.get('/animes', async (req, res) => {
+  try {
+    // Fazer a requisição HTTP para o site
+    const response = await axios.get(url);
 
-  // Validação básica dos campos (adicione mais validações conforme necessário)
-  if (!nome || !mensagem) {
-    return res.status(400).json({ error: 'Nome e mensagem são obrigatórios' });
+    // Analisar o HTML da resposta
+    const $ = cheerio.load(response.data);
+
+    // Selecionar os elementos com a classe "containerAnimes"
+    const animes = $('.containerAnimes');
+
+    // Extrair os dados de cada anime
+    const animesData = animes.map((index, element) => {
+      const title = $(element).find('.animeTitle').text();
+      const link = $(element).find('.item').attr('href');
+      const image = $(element).find('.imgAnimes').attr('data-src');
+      const lastEpisode = $(element).find('.horaUltimosEps').text();
+
+      return {
+        title,
+        link,
+        image,
+        lastEpisode,
+      };
+    }).get();
+
+    // Retornar os dados dos animes em formato JSON
+    res.json(animesData);
+  } catch (error) {
+    console.error('Erro ao raspar o site:', error);
+    res.status(500).json({ error: 'Erro ao obter os dados' });
   }
-
-  // Cria um novo objeto de mensagem
-  const newMessage = {
-    nome,
-    verificado: verificado || false, // Verificado é opcional, define como false por padrão
-    foto,
-    mensagem,
-    timestamp: new Date().toISOString(), // Adiciona um timestamp à mensagem
-  };
-
-  // Adiciona a mensagem ao array de dados do chat
-  chatData.push(newMessage);
-
-  // Retorna a resposta
-  res.status(201).json({ message: 'Mensagem adicionada com sucesso', newMessage });
 });
 
-// Rota para obter as últimas N mensagens do chat
-app.get('/chat', (req, res) => {
-  const { count = 10 } = req.query; // Define o número de mensagens a serem retornadas, 10 por padrão
-  const lastMessages = chatData.slice(-count); // Obtem as últimas N mensagens
-  res.json(lastMessages);
-});
-
-// Inicia o servidor
+// Iniciar o servidor
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
 });
