@@ -1,29 +1,36 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const express = require('express');
-const app = express();
-const port = 3000;
+const puppeteer = require('puppeteer');
 
-app.get('/api/new-episodes', async (req, res) => {
+async function getMp4Link(url) {
   try {
-    const response = await axios.get('https://animesdigital.org/');
-    const $ = cheerio.load(response.data);
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
 
-    const episodes = [];
-    $('.episode-block').each((index, element) => {
-      const title = $(element).find('.episode-title a').text().trim();
-      const episodeNumber = $(element).find('.episode-number').text().trim();
-      const episodeLink = $(element).find('.episode-title a').attr('href');
-      episodes.push({ title, episodeNumber, episodeLink });
-    });
+    await page.goto(url);
 
-    res.json(episodes);
+    // Aguarde o carregamento do player de vídeo
+    await page.waitForSelector('video');
+
+    // Obtenha o atributo 'src' do elemento de vídeo
+    const mp4Link = await page.$eval('video', (video) => video.src);
+
+    await browser.close();
+
+    return mp4Link;
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Erro ao buscar episódios' });
+    console.error('Erro ao obter o link MP4:', error);
+    return null;
   }
-});
+}
 
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
-});
+async function main() {
+  const videoUrl = 'https://animesdigital.org/video/a/123101/';
+  const mp4Link = await getMp4Link(videoUrl);
+
+  if (mp4Link) {
+    console.log('Link MP4:', mp4Link);
+  }
+}
+
+main();
