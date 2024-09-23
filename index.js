@@ -6,14 +6,14 @@ const port = 3000;
 
 app.get('/api/new-episodes', async (req, res) => {
   try {
-    const response = await axios.get('https://www.crunchyroll.com/pt-br/new');
+    const response = await axios.get('https://animesdigital.org/');
     const $ = cheerio.load(response.data);
 
     const episodes = [];
-    $('.media-grid-item').each((index, element) => {
-      const title = $(element).find('.media-grid-item-title').text().trim();
-      const episodeNumber = $(element).find('.media-grid-item-episode').text().trim();
-      const episodeLink = $(element).find('.media-grid-item-link').attr('href');
+    $('.episode-block').each((index, element) => {
+      const title = $(element).find('.episode-title a').text().trim();
+      const episodeNumber = $(element).find('.episode-number').text().trim();
+      const episodeLink = $(element).find('.episode-title a').attr('href');
       episodes.push({ title, episodeNumber, episodeLink });
     });
 
