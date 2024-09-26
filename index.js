@@ -2,8 +2,8 @@ const { Telegraf } = require('telegraf');
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const BOT_TOKEN = '7205848165:AAFueVRtFLGHtTExyoPpHV5b44IoSszOiPg';
-const URL_ANIMEFIRE = 'https://animefire.plus';
+const BOT_TOKEN = process.env.BOT_TOKEN; // Variável de ambiente da Vercel
+const URL_ANIMEFIRE = process.env.URL_ANIMEFIRE; // Variável de ambiente da Vercel
 
 const bot = new Telegraf(BOT_TOKEN);
 
@@ -28,7 +28,7 @@ const getEpisodes = async () => {
     });
     return episodes;
   } catch (error) {
-    console.error('Erro ao obter episódios:', error);
+    console.error('Erro ao obter episódios:', error); 
     return [];
   }
 };
@@ -46,17 +46,39 @@ const sendNewEpisodes = async (episodes) => {
 
 const checkForNewEpisodes = async () => {
   const newEpisodes = await getEpisodes();
-  // Adicione lógica para verificar se existem novos episódios
-  // e enviar mensagens para o grupo do Telegram
-  await sendNewEpisodes(newEpisodes);
+  await sendNewEpisodes(newEpisodes); 
 };
 
 bot.start((ctx) => ctx.reply('Bem-vindo! 👋'));
 
+bot.command('adicionar', async (ctx) => {
+  const link = ctx.message.text.split(' ')[1]; 
+  try {
+    const response = await axios.get(link);
+    const $ = cheerio.load(response.data);
+
+    const título = $('h1.animeTitle').text();
+    const episódio = $('span.numEp').text();
+    const capa = $('img.img-fluid.lazy.imgAnimes').attr('data-src');
+
+    const chatId = '-1001976226296'; 
+    const message = `Novo episódio disponível! 🎉\n\n` +
+      `**${título} - Episódio ${episódio}**\n` +
+      `[${título}](${link})\n` +
+      `![Capa](${capa})`;
+    await bot.telegram.sendMessage(chatId, message, { parse_mode: 'Markdown' });
+
+    ctx.reply('Episódio adicionado com sucesso!');
+  } catch (error) {
+    console.error('Erro ao adicionar episódio:', error); 
+    ctx.reply('Erro ao adicionar o episódio. Verifique o link.');
+  }
+});
+
 bot.launch();
 
 // Verifique por novos episódios periodicamente
-setInterval(checkForNewEpisodes, 1000 * 60 * 5); // Verifica a cada 5 minutos
+setInterval(checkForNewEpisodes, 1000 * 60 * 5); 
 
 // Iniciar servidor para a Vercel
 const express = require('express');
