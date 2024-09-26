@@ -1,36 +1,70 @@
+const { Telegraf } = require('telegraf');
 const axios = require('axios');
 const cheerio = require('cheerio');
-const puppeteer = require('puppeteer');
 
-async function getMp4Link(url) {
+const BOT_TOKEN = '7205848165:AAFueVRtFLGHtTExyoPpHV5b44IoSszOiPg';
+const URL_ANIMEFIRE = 'https://animefire.plus';
+
+const bot = new Telegraf(BOT_TOKEN);
+
+const getEpisodes = async () => {
   try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
+    const response = await axios.get(URL_ANIMEFIRE);
+    const $ = cheerio.load(response.data);
+    const itemElements = $('div.col-12.col-sm-6.col-md-4.col-lg-6.col-xl-3.divCardUltimosEpsHome');
+    const episodes = [];
 
-    await page.goto(url);
+    itemElements.each((index, element) => {
+      const link = $(element).find('a').attr('href');
+      const capa = $(element).find('img.card-img-top.lazy.imgAnimesUltimosEps').attr('data-src');
+      const título = $(element).find('h3.animeTitle').text();
+      const episodio = $(element).find('span.numEp').text();
 
-    // Aguarde o carregamento do player de vídeo
-    await page.waitForSelector('video');
-
-    // Obtenha o atributo 'src' do elemento de vídeo
-    const mp4Link = await page.$eval('video', (video) => video.src);
-
-    await browser.close();
-
-    return mp4Link;
+      episodes.push({
+        link,
+        capa,
+        título,
+        episodio,
+      });
+    });
+    return episodes;
   } catch (error) {
-    console.error('Erro ao obter o link MP4:', error);
-    return null;
+    console.error('Erro ao obter episódios:', error);
+    return [];
   }
-}
+};
 
-async function main() {
-  const videoUrl = 'https://animesdigital.org/video/a/123101/';
-  const mp4Link = await getMp4Link(videoUrl);
-
-  if (mp4Link) {
-    console.log('Link MP4:', mp4Link);
+const sendNewEpisodes = async (episodes) => {
+  const chatId = '-1001976226296'; // Substitua pelo ID do seu grupo do Telegram
+  for (const episode of episodes) {
+    const message = `Novo episódio disponível! 🎉\n\n` +
+      `**${episode.título} - Episódio ${episode.episodio}**\n` +
+      `[${episode.título}](${URL_ANIMEFIRE}${episode.link})\n` +
+      `![Capa](${episode.capa})`;
+    await bot.telegram.sendMessage(chatId, message, { parse_mode: 'Markdown' });
   }
-}
+};
 
-main();
+const checkForNewEpisodes = async () => {
+  const newEpisodes = await getEpisodes();
+  // Adicione lógica para verificar se existem novos episódios
+  // e enviar mensagens para o grupo do Telegram
+  await sendNewEpisodes(newEpisodes);
+};
+
+bot.start((ctx) => ctx.reply('Bem-vindo! 👋'));
+
+bot.launch();
+
+// Verifique por novos episódios periodicamente
+setInterval(checkForNewEpisodes, 1000 * 60 * 5); // Verifica a cada 5 minutos
+
+// Iniciar servidor para a Vercel
+const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => {
+  res.send('API Telegram AnimeFire.Plus');
+});
+
+module.exports = app;
