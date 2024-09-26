@@ -11,10 +11,9 @@ const getEpisodes = async () => {
   try {
     const response = await axios.get(URL_ANIMEFIRE);
     const $ = cheerio.load(response.data);
-    const itemElements = $('div.col-12.col-sm-6.col-md-4.col-lg-6.col-xl-3.divCardUltimosEpsHome');
     const episodes = [];
 
-    itemElements.each((index, element) => {
+    $('div.col-12.col-sm-6.col-md-4.col-lg-6.col-xl-3.divCardUltimosEpsHome').each((index, element) => {
       const link = $(element).find('a').attr('href');
       const capa = $(element).find('img.card-img-top.lazy.imgAnimesUltimosEps').attr('data-src');
       const título = $(element).find('h3.animeTitle').text();
