@@ -31,6 +31,57 @@ let episodes = [
     episodio: 4,
     link: "http://master.misterkobe.shop:2086/serie/deregodego/newhasta/sericucu/2/0n3p13c34s3r1T01E04DUB.mp4"
   }
+    {
+    
+  },
+id: 111110,
+    temporada: 1,
+    
+    epi
+episodio: 5,
+    link: "http://master.misterkobe.shop:2086/serie/deregodego/newhasta/sericucu/2/0n3p13c34s3r1T01E05DUB.mp4"
+  },
+  {
+    
+  },
+ 
+id: 111110,
+    
+    temporad
+temporada: 1,
+    
+    epi
+episodio: 6,
+    link: "http://master.misterkobe.shop:2086/serie/deregodego/newhasta/sericucu/2/0n3p13c34s3r1T01E06DUB.mp4"
+  },
+  {
+    id: 111110,
+    temporada: 1,
+    episodio: 7,
+    link: "http://master.misterkobe.shop:2086/serie/deregodego/newhasta/sericucu/2/0n3p13c34s3r1T01E07DUB.mp4"
+  },
+  {
+    id: 111110,
+    temporada: 1,
+    episodio: 8,
+    link: "http://master.misterkobe.shop:2086/serie/deregodego/newhasta/sericucu/2/0n3p13c34s3r1T01E08DUB.mp4"
+  }
+];
+Com esse código, você tem uma lista de episódios de 1 a 8, cada um com um id, `temporatemporada, `episódiosepisodioe o respectivo `lilink.
+
+Se
+
+
+
+
+
+
+
+
+
+
+
+O ChatGPT
 ];
 
 // Rota principal
