@@ -43,6 +43,22 @@ app.get('/episodes', (req, res) => {
   res.json(episodes);
 });
 
+// Rota para obter um episódio específico usando ID, temporada e episódio
+app.get('/episodes/:id/:temporada/:episodio', (req, res) => {
+  const id = parseInt(req.params.id);
+  const temporada = parseInt(req.params.temporada);
+  const episodio = parseInt(req.params.episodio);
+
+  // Encontrar o episódio que corresponda a ID, temporada e episódio
+  const episode = episodes.find(ep => ep.id === id && ep.temporada === temporada && ep.episodio === episodio);
+
+  if (episode) {
+    res.json({ link: episode.link });
+  } else {
+    res.status(404).json({ error: 'Episódio não encontrado' });
+  }
+});
+
 // Rota para obter um episódio por ID
 app.get('/episodes/:id', (req, res) => {
   const id = parseInt(req.params.id);
@@ -113,4 +129,4 @@ app.delete('/episodes/:id', (req, res) => {
 app.listen(port, () => {
   console.log(`API rodando em http://localhost:${port}`);
 });
-      
+    
