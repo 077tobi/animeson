@@ -8,28 +8,28 @@ app.use(express.json());
 // Dados simulados
 let episodes = [
   {
-    id: 1,
+    id: 111110,
     temporada: 1,
     episodio: 1,
-    link: "https://example.com/temporada1/episodio1"
+    link: "http://master.misterkobe.shop:2086/serie/deregodego/newhasta/sericucu/2/0n3p13c34s3r1T01E01DUB.mp4"
   },
   {
-    id: 2,
+    id: 111110,
     temporada: 1,
     episodio: 2,
-    link: "https://example.com/temporada1/episodio2"
+    link: "http://master.misterkobe.shop:2086/serie/deregodego/newhasta/sericucu/2/0n3p13c34s3r1T01E02DUB.mp4"
   },
   {
-    id: 3,
-    temporada: 2,
-    episodio: 1,
-    link: "https://example.com/temporada2/episodio1"
+    id: 111110,
+    temporada: 1,
+    episodio: 3,
+    link: "http://master.misterkobe.shop:2086/serie/deregodego/newhasta/sericucu/2/0n3p13c34s3r1T01E03DUB.mp4"
   },
   {
-    id: 4,
-    temporada: 2,
-    episodio: 2,
-    link: "https://example.com/temporada2/episodio2"
+    id: 111110,
+    temporada: 1,
+    episodio: 4,
+    link: "http://master.misterkobe.shop:2086/serie/deregodego/newhasta/sericucu/2/0n3p13c34s3r1T01E04DUB.mp4"
   }
 ];
 
