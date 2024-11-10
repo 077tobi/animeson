@@ -1,22 +1,32 @@
 {
-  "name": "Catálogo de Produtos",
-  "description": "Lista de produtos da loja",
+  "name": "TMDb Animes",
+  "description": "Lista de animes extraída do The Movie Database (TMDb)",
   "version": "1.0.0",
-  "author": "João Silva",
+  "author": "Seu Nome",
   "data": [
     {
-      "id": 1,
-      "nome": "Camiseta",
-      "descricao": "Camiseta de algodão, tamanho M",
-      "preco": 29.99,
-      "imagem": "https://www.example.com/camiseta.jpg"
+      "id": 12345,
+      "titulo": "Attack on Titan",
+      "categoria": "Ação",
+      "avaliacao": 8.5,
+      "ano": 2013,
+      "poster_path": "/path/to/poster.jpg" // Caminho da imagem do poster
     },
     {
-      "id": 2,
-      "nome": "Calça Jeans",
-      "descricao": "Calça Jeans azul, tamanho 40",
-      "preco": 59.99,
-      "imagem": "https://www.example.com/calca.jpg"
+      "id": 67890,
+      "titulo": "Demon Slayer: Kimetsu no Yaiba",
+      "categoria": "Aventura",
+      "avaliacao": 8.7,
+      "ano": 2019,
+      "poster_path": "/path/to/poster2.jpg" // Caminho da imagem do poster
+    },
+    {
+      "id": 11122,
+      "titulo": "My Hero Academia",
+      "categoria": "Super-herói",
+      "avaliacao": 8.2,
+      "ano": 2016,
+      "poster_path": "/path/to/poster3.jpg" // Caminho da imagem do poster
     }
   ]
 }
