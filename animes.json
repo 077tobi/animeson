@@ -1,9 +1,4 @@
-{
-  "name": "TMDb Animes",
-  "description": "Lista de animes extraída do The Movie Database (TMDb)",
-  "version": "1.0.0",
-  "author": "Seu Nome",
-  "data": [
+[
     {
       "id": 12345,
       "titulo": "Attack on Titan",
@@ -29,4 +24,3 @@
       "poster_path": "/path/to/poster3.jpg"
     }
   ]
-}
