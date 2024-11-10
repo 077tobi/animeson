@@ -10,7 +10,7 @@
       "categoria": "Ação",
       "avaliacao": 8.5,
       "ano": 2013,
-      "poster_path": "/path/to/poster.jpg" // Caminho da imagem do poster
+      "poster_path": "/path/to/poster.jpg"
     },
     {
       "id": 67890,
@@ -18,7 +18,7 @@
       "categoria": "Aventura",
       "avaliacao": 8.7,
       "ano": 2019,
-      "poster_path": "/path/to/poster2.jpg" // Caminho da imagem do poster
+      "poster_path": "/path/to/poster2.jpg"
     },
     {
       "id": 11122,
@@ -26,7 +26,7 @@
       "categoria": "Super-herói",
       "avaliacao": 8.2,
       "ano": 2016,
-      "poster_path": "/path/to/poster3.jpg" // Caminho da imagem do poster
+      "poster_path": "/path/to/poster3.jpg"
     }
   ]
 }
