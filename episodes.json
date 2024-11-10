@@ -1,9 +1,4 @@
-{
-  "name": "TMDb Animes - Episódios",
-  "description": "Lista de episódios de animes extraída do The Movie Database (TMDb)",
-  "version": "1.0.0",
-  "author": "Seu Nome",
-  "data": [
+[
     {
       "id_anime": 12345, 
       "titulo_episodio": "O Ataque dos Titãs",
