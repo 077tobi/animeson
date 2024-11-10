@@ -1,1 +1,22 @@
-
+{
+  "name": "Catálogo de Produtos",
+  "description": "Lista de produtos da loja",
+  "version": "1.0.0",
+  "author": "João Silva",
+  "data": [
+    {
+      "id": 1,
+      "nome": "Camiseta",
+      "descricao": "Camiseta de algodão, tamanho M",
+      "preco": 29.99,
+      "imagem": "https://www.example.com/camiseta.jpg"
+    },
+    {
+      "id": 2,
+      "nome": "Calça Jeans",
+      "descricao": "Calça Jeans azul, tamanho 40",
+      "preco": 59.99,
+      "imagem": "https://www.example.com/calca.jpg"
+    }
+  ]
+}
