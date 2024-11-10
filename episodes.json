@@ -1,5 +1,5 @@
 [
-    {
+ {
       "id_anime": 12345, 
       "titulo_episodio": "O Ataque dos Titãs",
       "capa_episodio": "https://image.tmdb.org/t/p/w500/path/to/episode/poster.jpg",
@@ -25,5 +25,5 @@
       "link_episodio": "https://www.example.com/anime/67890/episode/1",
       "numero_episodio": 1,
       "numero_temporada": 1
-    }
+  }
 ]
