@@ -26,4 +26,13 @@
     "numero_episodio": 1,
     "numero_temporada": 1
   }
+  {
+    "id_anime": 67890,
+    "titulo_episodio": "O Fim",
+    "capa_episodio": "https://image.tmdb.org/t/p/w500/path/to/episode/poster3.jpg",
+    "sinopse_episodio": "Tanjiro Kamado, um jovem que vende carvão, descobre que sua família foi massacrada por um demônio.",
+    "link_episodio": "https://www.example.com/anime/67890/episode/1",
+    "numero_episodio": 4,
+    "numero_temporada": 1
+  }
 ]
